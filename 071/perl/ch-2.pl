@@ -323,3 +323,9 @@ for ( 1..6 ) {
         $example->push_back( $clean_itr );
     }
 }
+
+::dprint "testing garbage collect\n";
+
+undef $example;
+
+::dprint "main finised here.\n";
