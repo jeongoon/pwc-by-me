@@ -96,33 +96,6 @@ sub get_peak_from_array ( @ ) {
 
     ::dpush "visual list: ";
     for (@_) {
-        my $asc = ( $_[$n+1] || 0 ) > $_[$n++] ? 1 : 0;
-        if ( $::debugging ) {
-            ::dpush $pasc?IC:DC;
-            if ( $pasc && ! $asc ) {
-                push @ps, $_;
-                ::dpush " ", colored( ['yellow on_black'], $_ ), " ";
-            }
-            else {
-                ::dpush " $_ ";
-            }
-        }
-        else {
-            next if not $asc;
-        }
-        $pasc = $asc << 1;
-        ::dmesg " ", ($pasc?IC:DC), "\n";
-    return @ps;
-}
-
-sub get_peak_from_array_orig ( @ ) {
-    my $n     =  0;
-    my $l     =  1;
-    my $pasc  =  1 << 1; # previous ascend value
-    my @ps;
-
-    ::dpush "visual list: ";
-    for (@_) {
 
 =pod
 
@@ -136,8 +109,6 @@ sub get_peak_from_array_orig ( @ ) {
         my $d = ( ( $_[$n+1] || 0 ) - $_[$n++] ); # (d)elta
         $d /= abs $d; # need direction only
         my $asc = (0,1,0)[$d]; # d == 1 -> $asc = 0, $t == -1  -> $asc = 1;
-        #my $asc = ( $_[$n+1] || 0 ) - $_[$n++] ? 1 : 0;
-
         ::dpush $pasc?IC:DC;
 
         # I found the bit operation is interesting
@@ -175,12 +146,6 @@ pod2usage( -exitval => 0, -verbose => 2 ) if $::help;
 my @r_array = make_random_array_( 'number-of-array' => $::N,
                                   'elements' => [ 1..50 ] );
 $"=", ";
-
-#use Benchmark qw { cmpthese };
-#cmpthese(-2, {
-#              orig => sub { get_peak_from_array_orig @r_array },
-#              edidted => sub { get_peak_from_array @r_array },
-#             } );
 
 print "Array: [ @r_array ]\n";
 print "Peak:  [ ".join($", get_peak_from_array @r_array)." ]";
