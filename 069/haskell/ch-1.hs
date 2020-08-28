@@ -12,7 +12,7 @@ ghc ch-1.hs
 wikiStroboDigits :: [Int];
 wikiStroboDigits =  [ 0, 1, 6, 8, 9 ];
 symmetricDigits ::  [Int];
-symmetricDigits = [ 0, 1, 8 ];
+symmetricDigits =   [ 0, 1, 8 ];
 
 lengthOfInt :: (Integral a, Integral b) => a -> b -> b
 lengthOfInt x acc
@@ -31,10 +31,12 @@ generateStroboLeft halfLen clen acc -- clen initial value must be 1
   | halfLen < 1     = [[]]
   | halfLen == 1     = [ [x] | x <- tail wikiStroboDigits ]
   | halfLen >= clen =
-      generateStroboLeft halfLen (clen+1) [ foldr (:) [stb] l | l <- acc
-                                                             , stb <- stroboLeft ]
+      let nxtLen = clen + 1
+          stroboLeft = if clen == 1  then tail wikiStroboDigits else wikiStroboDigits
+      in -- seq nxtLen $ seq stroboLeft $ -- this doesn't help performance
+         generateStroboLeft halfLen nxtLen [ foldr (:) [stb] l | l <- acc
+                                                           , stb <- stroboLeft ]
   | otherwise    = acc
-  where stroboLeft = if clen == 1  then tail wikiStroboDigits else wikiStroboDigits
 
 stroboNumbersWith :: (Eq a, Integral a) => a -> [[Int]] -> [Int]
 stroboNumbersWith totLen leftOnlyAcc =
@@ -55,7 +57,7 @@ concatInt :: [Int] -> Int
 concatInt = foldl (\x y -> x*10+y) 0
 
 filterRange :: Int -> Int -> [Int] -> [Int]
-filterRange a b ls = filter (\x -> a <= x && x <= b ) ls
+filterRange a b ls = filter (\x -> a <= x && x <= b) ls
 
 stroboNumbersWithRange :: Int -> Int -> Int -> Int -> Int -> [Int] -> [Int]
 stroboNumbersWithRange a b minLen maxLen len acc
@@ -64,10 +66,15 @@ stroboNumbersWithRange a b minLen maxLen len acc
   | len > maxLen = acc
   | len == minLen || len == maxLen =
       let acc' = filterRange a b $ stroboNumbersWith len [[]] -- not [] but [[]]
-      in stroboNumbersWithRange a b minLen maxLen (len+1) (acc ++ acc')
+      in {-seq acc' $ -- this doesn't help
+        seq minLen $ seq maxLen $-}
+        stroboNumbersWithRange a b minLen maxLen (len+1) (acc ++ acc')
   | otherwise =
       let acc' = stroboNumbersWith len [[]]
-      in stroboNumbersWithRange a b minLen maxLen (len+1) (acc ++ acc')
+
+      in seq minLen $ seq maxLen $
+      {- but here's seqs does help -}
+      {-seq acc'$ -} stroboNumbersWithRange a b minLen maxLen (len+1) (acc ++ acc')
   where
     minlen = (lengthOfInt a 1)
     maxlen = (lengthOfInt b 1)
@@ -77,7 +84,8 @@ main = do
   args <- getArgs
 
   if length args /= 2 then
-    die $ "[ERR] Wrnong Number of Args: " ++ (show (length args)) ++ "must be == 2"
+    die $ "[ERR] Wrnong Number of Args: " ++ (show (length args)) ++
+        ": must be == 2"
     else
     return ()
 
@@ -85,4 +93,5 @@ main = do
       b = read ( args !! 1 ) :: Int
       numbers = stroboNumbersWithRange a b 0 0 0 []
 
-  mapM_ (\x -> print x) numbers
+  mapM_ print numbers
+  {-mapM_ (putStrLn . show ) numbers-} -- former one is better in performance
