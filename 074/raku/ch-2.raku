@@ -9,7 +9,7 @@ role fnr {
     method sayLNR ( Str:D $str = self.Str ) {
         for 1 .. $str.chars -> $last-index {
             my $sub-chars = $str.substr( 0, $last-index );
-            my @candi = @sub-chars.unique;
+            my @candi = $sub-chars.comb.unique;
             my ( $nr-pos, $nr-char ) =  ( -1, '#' );
 
             for @candi -> $c {
