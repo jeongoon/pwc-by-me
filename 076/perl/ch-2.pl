@@ -64,7 +64,7 @@ BEGIN {
 # all the directions in a linear form
 sub allColumnIndices ($$) {
     my ( $maxPos, $lineLen ) = @_;
-    ( $lineLen == 0 ) and ( warn "line number is zero!!!", return () );
+    ( $lineLen == 0 ) and ( warn ( "line number is zero!!!" ), return () );
     my $rowsIdx = int $maxPos / $lineLen;
     map { my $c = $_;
           [ map { my $p = $c + $lineLen * $_;
