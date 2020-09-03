@@ -9,7 +9,8 @@ import System.Exit (die)
 import Control.Exception
 
 {- tested with:
- runhaskell ch-2.hs --grid ../data/grid.txt --dict ../data/tinyDict.txt
+ghc ch-2.hs
+./ch-2 --grid ../data/grid.txt --dict ../data/tinyDict.txt
  # or this will use `/usr/share/dict/british-english' by default
 -}
 
@@ -112,11 +113,15 @@ bothDirectAllIndices = flatOnce.(map obverseAndReverse).allIndices where
       | otherwise     = [ a, reverse a ]
 
 -- final result of indices
-allUsefulCombinationIndices = usefulInits.usefulTails.bothDirectAllIndices where
-  -- note: a character might be not useful to compare: disgarded
+
+allUsefulCombinationIndices = {-usefulInits.
+  -- note: wordTreeGetAllWords generate all subsequence which begins from
+  --       the begining so we can skip generating `inits'
+-}
+  usefulTails.bothDirectAllIndices where
   -- another possible approach might be (not checked)
   -- (filter ((2<).length).subsequences)
-  usefulInits = flatOnce.map (drop 2. inits)
+  --usefulInits = flatOnce.map (drop 2. inits)
   usefulTails = flatOnce.map
                 ((\ls -> let len = length ls in take (len-2) ls).tails)
 
@@ -210,7 +215,7 @@ main = do
   args <- getRecord "Challennge #076 - Task #2"
   let sample = args :: Sample
       gridPath = case (grid sample) of
-                   Nothing -> "grid.txt"
+                   Nothing -> defaultGridFile
                    Just gp -> gp
       dictPath = case (dict sample) of
                    Nothing -> defaultDictionary

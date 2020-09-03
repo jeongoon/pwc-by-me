@@ -10,7 +10,7 @@ perl ch-2.pl --grid <word search grid file path> --dict <dictionary file path>
 
 =head1 Solution
 
-#. assumption: dictionary already stored in lower case in ascending order.
+#. assumption: dictionary already stored in ascending order.
 
 1. store every possible words in every direction into array (and sorted)
    this words has possibly quite a huge amount of sub sequences
@@ -141,7 +141,7 @@ sub genWordsOrganized {
                allSubsequencesIndices( $maxPos, $lineLen ) ) );
 }
 
-sub unsafe_readChaos { # unsafe means can throw exception
+sub unsafe_readChaos { # unsafe means can throw exception(die)
     my $chaosPath = shift;
     -r $chaosPath or ::dprint( "[ERR] $chaosPath: not readable: bye!\n" );
 
@@ -177,7 +177,6 @@ sub unsafe_openDict {
 sub getDictWord ($$) {
     state $lastDictWord;
     my ( $dfh, $update ) = @_;
-    $update //= 0;
 
     if ( not defined $lastDictWord or $update ) {
         $lastDictWord = <$dfh>;
@@ -196,10 +195,12 @@ sub grepMatchedWords {
 
     my @result;
     my $update_dict = 1;
-  GridWords:
+  GRID_WORDS:
     for ( my $gi = 0; $gi < @gridWords; ) {
-        my $dictWord = getDictWord( $dfh, $update_dict );
-        defined $dictWord or last GridWords;
+        # note: lc() for sure
+        my $dictWord = lc getDictWord( $dfh, $update_dict );
+        defined $dictWord or last GRID_WORDS;
+        ::dprint "$dictWord vs $gridWords[$gi]\n" if 0;
         for ( $dictWord cmp $gridWords[$gi] ) {
             when (-1) {
                 $update_dict = 1;
