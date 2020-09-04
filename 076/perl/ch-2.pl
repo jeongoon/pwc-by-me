@@ -105,7 +105,7 @@ sub allTopRightToBottomLeftIndices ($$) {
               ( ($p <= $maxPos) and (($p % $lineLen) < $col) )
                 ? $p: ()
             } (map {$_*($lineLen-1)} 1 .. $col) ] }
-    ( 0 .. ($lineLen -1), map { $lineLen*$_ -1 } 2 .. $rowsIdx )
+    ( 0 .. ($lineLen -1), map { $lineLen*$_ -1 } 2 .. $rowsIdx+1 )
 }
 
 sub allIndices ($$) { # summary of directions shown above
@@ -126,7 +126,8 @@ sub subsequences {
     # against a whole possible line. but... my dictionary contains 127,466 lines
     ( @_ == 1 ) and return [ @_ ];
 
-    [ $_[0] ], map{ [ @_[ $$_[0] .. $$_[1] ] ] } combinationsIndex(2, scalar@_)
+    map {[$_]} @_,
+      map{ [ @_[ $$_[0] .. $$_[1] ] ] } combinationsIndex(2, scalar@_)
 }
 
 sub allSubsequencesIndices { # final summary of indices
@@ -135,7 +136,7 @@ sub allSubsequencesIndices { # final summary of indices
       map { bothDirection @$_ } allIndices( $maxPos, $lineLen );
 }
 
-say scalar allSubsequencesIndices( 303, 16 );
+#say scalar allSubsequencesIndices( 303, 16 );
 
 sub genWordsOrganized {
     my ( $maxPos, $lineLen, $gridString ) = @_;

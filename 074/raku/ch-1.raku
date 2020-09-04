@@ -12,7 +12,8 @@ sub get-major ( Int @list ) {
     }
 
     my @sorted = @list.sort;
-    my $half-len = @sorted.elems * 0.5 .floor;
+    my $half-len = .5 * @sorted.elems .floor;
+    # my $half-len = .5 * @sorted.elems * 0.5 .floor;  # this is a bug
     my ( $pnum, $pcnt, $res ) = @sorted.shift, 1, -1;
 
     for @sorted -> $cnum {

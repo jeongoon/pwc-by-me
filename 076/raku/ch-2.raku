@@ -148,13 +148,13 @@ sub MAIN (
     say @result.raku if $debugging;
     say "Total {@result.elems} word(s) found.";
 
-    if 1 { # small test for indices: change to 1 to have a look
+    if 0 { # small test for indices: change to 1 to have a look
         # 0  1  2
         # 3  4  5
         # 6  7  8
         # 9 10
 
-        my $test = GridSizeInfo.new( :max-pos(303), :line-len(16) );
+        my $test = GridSizeInfo.new( :max-pos(10), :line-len(3) );
         with $test {
             say .all-columns-indices;
             say .all-rows-indices;
