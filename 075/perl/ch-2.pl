@@ -154,6 +154,6 @@ sub printLargestRectArea {
 package main;
 
 ( $::help or scalar @ARGV < 1 )
-  and pod2usage( -exitval => 0 -verbose => 2 );
+  and pod2usage( -exitval => 0, -verbose => 2 );
 
 printLargestRectArea @ARGV;
