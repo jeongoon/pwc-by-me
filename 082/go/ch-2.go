@@ -19,24 +19,28 @@ import (
 
 type MaybeIntereaved string
 
-func (C MaybeIntereaved) isInterleavingFrom (A string, B string) bool {
+type SavedPlace struct {
+	Apos int
+	Bpos int
+}
+
+func (C MaybeIntereaved) IsInterleavedFrom (A string, B string) bool {
 	Alen, Blen, Clen := len(A), len(B), len(C)
 	if Alen + Blen != Clen {
 		return false
 	}
 
-	Apin, Bpin := -1, -1 // if * >= 0, we have plan B
-	checkpingPlanB := false
+	savedPos := []SavedPlace{}
+
+	checkingPlanB := false
 
 	for Ai, Bi, Ci := 0, 0, 0 ;; Ci = Ai + Bi {
-		if checkpingPlanB {
-			if Bpin > -1 {
-				// note: it was A[Ai] == B[Bi] == C[Ci]
-				// and tried A already.
-				Bi = Bpin + 1
-				Ai = Apin
-				Apin, Bpin = -1, -1
-				checkpingPlanB = false
+		if checkingPlanB {
+			if len( savedPos ) > 0 {
+				Ai = savedPos[0].Apos
+				Bi = savedPos[0].Bpos
+				savedPos = savedPos[1:]
+
 				Ci = Ai + Bi
 			} else {
 				// there is no plan B ...
@@ -52,18 +56,25 @@ func (C MaybeIntereaved) isInterleavingFrom (A string, B string) bool {
 			if B[Bi:] == string(C[Ci:]) {
 				return true
 			} else {
-				checkpingPlanB = true
+				checkingPlanB = true
 				continue
 			}
 		} else if Bi == Blen {
-			return A[Ai:] == string(C[Ci:])
+			if A[Ai:] == string(C[Ci:]) {
+				return true
+			} else {
+				checkingPlanB = true
+				continue
+			}
 		}
 		if A[Ai] == B[Bi] {
 			if A[Ai] != C[Ci] {
-				checkpingPlanB = true
+				checkingPlanB = true
 			}  else {
 				// remember this node
-				Apin, Bpin = Ai, Bi
+				savedPos = append(
+					[]SavedPlace{ SavedPlace { Apos: Ai,
+						Bpos: (Bi+1) } }, savedPos...)
 				// try plan A first
 				Ai++
 			}
@@ -73,7 +84,7 @@ func (C MaybeIntereaved) isInterleavingFrom (A string, B string) bool {
 			} else if B[Bi] == C[Ci] {
 				Bi++
 			} else {
-				checkpingPlanB = true
+				checkingPlanB = true
 			}
 		}
 	}
@@ -91,7 +102,7 @@ func main() {
 	}
 	A, B, C := os.Args[1], os.Args[2], os.Args[3]
 
-	if MaybeIntereaved(C).isInterleavingFrom(A, B) {
+	if MaybeIntereaved(C).IsInterleavedFrom(A, B) {
 		fmt.Println( "1" )
 	} else {
 		fmt.Println( "0" )
